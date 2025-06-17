@@ -4,19 +4,19 @@ let video = document.querySelector("#video");
 let currentStream;
 let contador = 0;
 let name_btn = {
-    "30T": ["Precinto", "Tablero", "100%", "75%", "50%", "25%", "0%"],
-    "40T": ["Precinto", "Tablero", "100%", "75%", "50%", "25%", "0%"]
+    "20FT": ["Precinto", "Tablero", "Ficho", "Hoja1", "Hoja2", "100%", "50%", "0%"],
+    "40FT": ["Precinto", "Tablero", "Ficho", "Hoja1", "Hoja2", "100%", "75%", "50%", "25%", "0%"]
 };
 
 function agregarEntrada() {
     const formDiv = document.getElementById('formulario');
     const div = document.createElement('div');
     div.className = 'placa-entry';
-    div.id = `placa-${contador}`;
+    div.id = `placa-${contador}`;    
     div.innerHTML = `
                 <div class="section_entrada"><label class="lb_placa"><span>Placa</span><input type="text" name="placa" required oninput="actualizarFiltro()"></label>
-                <button class="btn_entrada" onclick="createElements(3, 'placa-${contador}', '30T', '40T')">🚚 30T</button>
-                <button class="btn_entrada" onclick="createElements(4, 'placa-${contador}', '40T', '30T')">🚚 40T</button></div>
+                <button class="btn_entrada" onclick="createElements(8, 'placa-${contador}', '20FT', '40FT')">🚚 20FT</button>
+                <button class="btn_entrada" onclick="createElements(10, 'placa-${contador}', '40FT', '20FT')">🚚 40FT</button></div>
             `;
     formDiv.appendChild(div);
     contador++;
@@ -33,10 +33,11 @@ function createElements(cant, element, nuevo, old) {
     if (!placaDiv.contains(sectionNew)) {
         const div = document.createElement('div');
         div.id = `${contador}${nuevo}`;
+        div.classList.add("section_preview");
         div.innerHTML += `
                     ${[...Array(cant)].map((_, i) => `<div class="section_foto"><img id="preview-${contador}${i}" class="preview">
-                    <button id="btn_camera-${contador}${i}" class="btn_camera" onclick="startCamera('${contador}${i}')">📷 ${name_btn[nuevo][i]}</button></div>`).join('<br>')}
-                    <div class="section_btns"><button class="btn_guardar" onclick="guardar('${contador}')">💾 Guardar</button>
+                    <button id="btn_camera-${contador}${i}" class="btn_camera" onclick="startCamera('${contador}${i}')">📷 ${name_btn[nuevo][i]}</button></div>`).join('')}
+                    <div class="section_btns"><button class="btn_guardar" onclick="guardar('${contador}', '${nuevo}')">💾 Guardar</button>
                     <button class="btn_eliminar" onclick="eliminar('${contador}')">X</button></div>
                 `;
         placaDiv.appendChild(div);
@@ -66,7 +67,6 @@ function close_video() {
 
 function capture(stage) {
     let id = stage.getAttribute("dataId");
-    console.log(id);
     const video = document.getElementById("camera");
     const canvas = document.getElementById("snapshot");
     canvas.width = video.videoWidth;
@@ -79,9 +79,16 @@ function capture(stage) {
     preview.classList.add("active");
     const btn_camera = document.getElementById(`btn_camera-${id}`);
     btn_camera.style.background = "#00787a";
+    
+    /*const enlace = document.createElement('a');
+    enlace.href = preview.src;
+    enlace.download = 'imagen-descargada.jpg'; // Nombre del archivo al guardar
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);*/
 }
 
-async function guardar(id) {
+async function guardar(id, nuevo) {
     const div = document.getElementById(`placa-${id}`);
     const placa = div.querySelector('input[type="text"]').value.trim();
     const imgElements = div.querySelectorAll('img');
@@ -102,8 +109,8 @@ async function guardar(id) {
             imagenes.push(img.src);
         }
     }
-    if (imagenes.length === 0) {
-        alert('Debes subir al menos 3 fotos.');
+    if (imagenes.length < 6) {
+        alert('Debes subir al menos 6 fotos. "Precinto", "Tablero", "Ficho", "Hoja1", "Hoja2", "100%"');
         return;
     }
 
@@ -128,7 +135,7 @@ async function guardar(id) {
             const byteArray = new Uint8Array(byteNumbers);
 
             // Agregar al ZIP
-            zip.file(`foto-${name_btn[i]}.${extension}`, byteArray);
+            zip.file(`foto-${name_btn[nuevo][i]}.${extension}`, byteArray);
         }
     }
 
