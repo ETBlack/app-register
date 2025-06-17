@@ -1,0 +1,240 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+main {
+    padding: 20px;
+    overflow: auto;
+}
+
+h1 {
+    margin: 0 0 20px 0;
+}
+
+.section-search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+#buscador {
+    border: 1px solid gainsboro;
+    border-radius: 5px;
+    padding: 7px;
+    width: 120px;
+}
+
+.btn_addPlaca {
+    border: none;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 7px 10px;
+    background: #1f7578;
+    color: #fff;
+    cursor: pointer;
+}
+
+#formulario {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 20px;
+}
+
+.placa-entry {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.3);
+}
+
+.lb_placa {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.lb_placa span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40%;
+    background: #00787a;
+    padding: 5px;
+    border-radius: 5px 0 0 5px;
+    color: #fff;
+    font-size: small;
+}
+
+.placa-entry input[type="text"] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70%;
+    padding: 5px 15px;
+    border: 1px solid #00787a;
+    border-radius: 0 5px 5px 0;
+    text-transform: uppercase;
+}
+
+.section_entrada {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.btn_entrada {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    border: none;
+    font-size: small;
+    min-width: fit-content;
+    cursor: pointer;
+}
+
+.section_foto {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 3px;
+}
+
+.preview {
+    display: none;
+    width: 70%;
+}
+
+.btn_camera {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #525f60;
+    width: 50%;
+    padding: 7px;
+    font-size: small;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.section_btns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.btn_guardar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    border: none;
+    border-radius: 5px;
+    background: #00787a;
+    padding: 10px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.btn_eliminar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 15%;
+    border: none;
+    border-radius: 5px;
+    background: #c70000;
+    padding: 10px;
+    color: #fff;
+    cursor: pointer;
+}
+
+#video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, .5);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.active {
+    display: flex !important;
+}
+
+#camera {
+    position: relative;
+    height: 100vh;
+}
+
+#btn_closeVideo {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    width: 30px;
+    border: none;
+    color: #fff;
+    background-color: transparent;
+    font-size: 1.5em;
+    cursor: pointer;
+    z-index: 150;
+}
+
+#btn_foto {
+    position: absolute;
+    bottom: 2em;
+    height: 40px;
+    width: 40px;
+    border: none;
+    background-color: red;
+    border-radius: 50%;
+    box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, .5);
+    cursor: pointer;
+    z-index: 150;
+}
+
+@media screen and (min-width: 700px) {}

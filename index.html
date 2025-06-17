@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Register</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main>
+        <h1>Registro de Vehículos</h1>
+        <div class="section-search">
+            <input type="text" id="buscador" placeholder="Buscar placa..." oninput="filtrarPlacas()">
+            <button class="btn_addPlaca" onclick="agregarEntrada()">Agregar Placa</button>
+        </div>
+        <div id="formulario"></div>
+    </main>
+    <div id="video">
+        <button id="btn_closeVideo" onclick="close_video()">X</button>
+        <video id="camera" autoplay></video>
+        <canvas id="snapshot" style="display:none;"></canvas>
+        <button id="btn_foto" onclick="capture(this)"></button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.0/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="js/main.js"></script>   
+</body>
+</html>
