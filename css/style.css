@@ -1,7 +1,46 @@
-* {
+/*=====================================================*/
+/* ⚙️ Reset / Normalize
+/*=====================================================*/
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    font-family: var(--font-base);
+}
+
+/* Anchura de la barra de desplazamiento */
+/* Para navegadores basados en WebKit como Chrome y Safari */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+/* Para navegadores basados en Gecko como Firefox */
+::-moz-scrollbar {
+    width: 5px;
+}
+
+/* Estilo de la barra de desplazamiento */
+::-webkit-scrollbar-thumb {
+    background-color: #8888883f;
+    /* Color del thumb (manija) */
+    border-radius: 5px;
+    /* Borde redondeado */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #55555550;
+    /* Color del thumb al pasar el mouse */
+}
+
+/* Estilo del track (pista) */
+::-webkit-scrollbar-track {
+    background-color: #f1f1f13b;
+    /* Color del track */
+    /*border-radius: 5px; /* Borde redondeado */
 }
 
 html {
@@ -10,8 +49,172 @@ html {
     overflow: hidden;
 }
 
-body {
-    font-family: sans-serif;
+.lato-thin {
+  font-family: "Lato", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.lato-light {
+  font-family: "Lato", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.lato-regular {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lato-bold {
+  font-family: "Lato", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.lato-black {
+  font-family: "Lato", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.lato-thin-italic {
+  font-family: "Lato", sans-serif;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.lato-light-italic {
+  font-family: "Lato", sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.lato-regular-italic {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.lato-bold-italic {
+  font-family: "Lato", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.lato-black-italic {
+  font-family: "Lato", sans-serif;
+  font-weight: 900;
+  font-style: italic;
+}
+
+
+/*=====================================================*/
+/* 📄 Page - Login
+/*=====================================================*/
+
+.login-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: #f5f5f5;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem;
+    box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, .3);
+    background: #fff;
+}
+
+.login-form-body {
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 2rem;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+}
+
+.login-form h2 {
+    color: #212529;
+}
+
+.login {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.login-input {
+    display: flex;
+    position: relative;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-input input {
+    padding: .5rem 1rem;
+    border: 1px solid #bfbfbf;
+    transition: border-color 0.3s;
+    outline: none;
+    width: 100%;
+    color: #333333;
+    background-color: #fff;
+    padding: 10px 37px 10px 15px;
+    border-radius: 3px;
+}
+
+.login-input label {
+    position: absolute;
+    left: 1.5em;
+    font-size: 0.95rem;
+    color: #a1a1a1;
+    pointer-events: none;
+    transition: 0.2s;
+}
+
+.login-input input:focus+label,
+.login-input input:not(:placeholder-shown)+label {
+    top: -17px;
+    font-size: 12px;
+    color: #212529;;
+}
+
+.login-button {
+    width: 100%;
+    padding: .7rem 1rem;
+    color: #fff;
+    background-color: #0071b6;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #004d7d;
+}
+
+
+/*=====================================================*/
+/* 📄 Page - Index
+/*=====================================================*/
+
+.index-body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -19,6 +222,7 @@ body {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    background-color: #f5f5f5;
 }
 
 main {
@@ -65,12 +269,13 @@ h1 {
     gap: 20px;
 }
 
-.placa-entry {
+.formPlaca {
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 15px;
     box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.3);
+    max-width: 300px;
 }
 
 .lb_placa {
@@ -91,7 +296,7 @@ h1 {
     font-size: small;
 }
 
-.placa-entry input[type="text"] {
+.formPlaca input[type="text"] {
     display: flex;
     justify-content: center;
     align-items: center;

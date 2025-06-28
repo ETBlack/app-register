@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-body">
+    <div id="loginForm" class="login-form">
+        <div class="login-form-body">
+            <h2>Iniciar sesión</h2>
+            <form id="login" class="login">
+                <div class="login-input">
+                    <input type="text" id="username" name="username" required="" placeholder="">
+                    <label for="username">Usuario</label>
+                </div>
+                <div class="login-input">
+                    <input type="password" id="password" name="password" required="" placeholder="">
+                    <label for="password">Contraseña</label>
+                </div>
+
+                <button type="submit" class="login-button">INICIAR SESIÓN</button>
+            </form>
+            <p id="errorMessage" style="color: red; display: none;">Usuario o contraseña incorrectos</p>
+        </div>
+    </div>
+
+    <script src="js/bcrypt.min.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
