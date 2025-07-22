@@ -1176,6 +1176,7 @@ function habilitarDibujo(canvas, ctx) {
         e.preventDefault();
         isDrawing = false;
         ctx.closePath();  // Termina el trazo
+        guardarFirma();
     });
 
     // También es recomendable manejar el caso de que el usuario cancele el toque
@@ -1183,6 +1184,7 @@ function habilitarDibujo(canvas, ctx) {
         e.preventDefault();
         isDrawing = false;
         ctx.closePath();
+        guardarFirma();
     });
 }
 
