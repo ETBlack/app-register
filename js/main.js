@@ -1189,6 +1189,7 @@ function habilitarDibujo(canvas, ctx) {
 // Función para obtener las coordenadas del toque, ajustadas para dispositivos móviles
 function getTouchPosition(e) {
     let touch = e.touches[0];  // Solo tomamos el primer toque
+    const canvas = document.getElementById('signatureCanvas'); 
     let rect = canvas.getBoundingClientRect();  // Obtener la posición del canvas en la pantalla
     return {
         x: touch.clientX - rect.left,
