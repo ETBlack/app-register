@@ -1,13 +1,41 @@
-let camera = document.querySelector("#camera");
-let video = document.querySelector("#video");
+/*******************************************************************/
+/*                      Opciones Formulario                        */
+/*******************************************************************/
+
+const registro_vehiculos = document.querySelector("#registro_vehiculos");
+const inspeccion_vehicular = document.querySelector("#inspeccion_vehicular");
+const radioButtonsFormularios = document.querySelectorAll('input[name="opcion_formulario"]');
+
+registro_vehiculos.classList.add('visible');
+radioButtonsFormularios.forEach(radio => {
+    radio.addEventListener('change', function () {
+        if (this.value == "registro_vehiculos") {
+            inspeccion_vehicular.classList.remove('visible');
+            registro_vehiculos.classList.add('visible');
+        } else {
+            registro_vehiculos.classList.remove('visible');
+            inspeccion_vehicular.classList.add('visible');
+        }
+    });
+});
+
+
+/*******************************************************************/
+/*                  Formulario Registro de Vehículos               */
+/*******************************************************************/
+
+const camera = document.querySelector("#camera");
+const video = document.querySelector("#video");
 
 let currentStream;
 let contador = 0;
 let container_1 = "20FT";
 let container_2 = "40FT";
+let formInspeccion = "formulario";
 let name_btn = {
     [container_1]: ["Precinto", "Tablero", "Ficho", "Hoja1", "Hoja2", "100%", "50%", "0%"],
-    [container_2]: ["Precinto", "Tablero", "Ficho", "Hoja1", "Hoja2", "100%", "75%", "50%", "25%", "0%"]
+    [container_2]: ["Precinto", "Tablero", "Ficho", "Hoja1", "Hoja2", "100%", "75%", "50%", "25%", "0%"],
+    [formInspeccion]: ["Precinto", "Ficho", "Frontal", "Trasera", "Lado Derecho", "Lado Izquierdo"]
 };
 
 const dbName = 'registroPlacaDB';
@@ -44,10 +72,11 @@ request.onsuccess = function (event) {
 document.addEventListener('DOMContentLoaded', function () {
     // Aquí va la función que deseas ejecutar
     //console.log('La página ha cargado y el DOM está listo.');
-    recuperarBody();
+    recuperarRegistro();
+    recuperarInspeccion();
 });
 
-async function guardarBody(formDiv) {
+async function guardarRegistro(formDiv) {
     const request = indexedDB.open(dbName, dbVersion);
 
     request.onsuccess = function (event) {
@@ -70,7 +99,7 @@ async function guardarBody(formDiv) {
     }
 }
 
-function recuperarBody() {
+function recuperarRegistro() {
     const request = indexedDB.open(dbName, dbVersion);
     const formDiv = document.getElementById('formulario');
 
@@ -90,6 +119,226 @@ function recuperarBody() {
         };
     };
 }
+
+async function guardarInspeccion(formDiv) {
+    const request = indexedDB.open(dbName, dbVersion);
+
+    request.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['history'], 'readwrite');
+        const store = transaction.objectStore('history');
+
+        // Guardar el HTML completo
+        const htmlContent = formDiv.innerHTML;
+
+        // Obtener todos los inputs de tipo 'text' y sus valores
+        const inputs = formDiv.querySelectorAll('input[type="text"]');
+        const inputValues = {};
+
+        inputs.forEach(input => {
+            inputValues[input.name] = input.value;
+        });
+
+        // Obtener los valores de los radio buttons seleccionados
+        const radioButtons = formDiv.querySelectorAll('input[type="radio"]:checked');
+        const radioValues = {};
+
+        radioButtons.forEach(radio => {
+            radioValues[radio.name] = radio.value;  // Guardar el valor seleccionado por nombre
+        });
+
+        // Capturar el contenido del canvas como imagen
+        const canvas = formDiv.querySelector('canvas');
+        const signatureImage = canvas ? canvas.toDataURL("image/png") : null; // Si no hay canvas, es null
+
+        // Guardar tanto el HTML, los valores de los inputs y la imagen del canvas
+        const formularioObject = {
+            id: 2,
+            html: htmlContent,  // Guardamos el HTML del formulario
+            inputValues: inputValues,  // Guardamos los valores de los inputs
+            radioValues: radioValues,  // Guardamos los valores de los radio buttons
+            signatureImage: signatureImage // Guardamos la imagen del canvas
+        };
+
+        const formularioRequest = store.put(formularioObject);
+        formularioRequest.onsuccess = function () {
+            console.log('Formulario guardado con éxito');
+        };
+    };
+}
+
+function recuperarInspeccion() {
+    const request = indexedDB.open(dbName, dbVersion);
+    const formDiv = document.getElementById('inspectionForm');
+
+    request.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['history'], 'readwrite');
+        const store = transaction.objectStore('history');
+
+        const requestGet = store.get(2);
+        requestGet.onsuccess = function (event) {
+            const bodyObject = event.target.result;
+            if (bodyObject) {
+                // Recuperar el HTML guardado
+                formDiv.innerHTML = bodyObject.html;
+
+                // Recuperar los valores de los inputs guardados
+                const inputValues = bodyObject.inputValues;
+
+                // Asignar los valores a los inputs correspondientes
+                for (const key in inputValues) {
+                    const input = formDiv.querySelector(`input[name="${key}"]`);
+                    if (input) {
+                        input.value = inputValues[key]; // Asignar el valor recuperado
+                    }
+                }
+
+                // Recuperar los valores de los radio buttons
+                const radioValues = bodyObject.radioValues;
+
+                // Restaurar la selección de los radio buttons
+                for (const name in radioValues) {
+                    const radioButton = formDiv.querySelector(`input[name="${name}"][value="${radioValues[name]}"]`);
+                    if (radioButton) {
+                        radioButton.checked = true;  // Marcar el radio button correspondiente
+                    }
+                }
+
+                // Si había una firma guardada, restaurarla en el canvas
+                const signatureImage = bodyObject.signatureImage;
+                const canvas = formDiv.querySelector('canvas');
+                const ctx = canvas.getContext('2d');
+
+                if (signatureImage) {
+                    // Crear una imagen a partir de la cadena base64
+                    const img = new Image();
+                    img.src = signatureImage;
+                    img.onload = function () {
+                        ctx.drawImage(img, 0, 0); // Dibuja la imagen en el canvas
+                    };
+                }
+
+                // Ahora restauramos los eventos de dibujo en el canvas para que el usuario pueda seguir escribiendo
+                habilitarDibujo(canvas, ctx); // Activar los eventos de dibujo nuevamente
+            } else {
+                console.log('Body no encontrado');
+            }
+        };
+    };
+}
+
+/*async function guardarInspeccion(formDiv) {
+    const request = indexedDB.open(dbName, dbVersion);
+
+    request.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['history'], 'readwrite');
+        const store = transaction.objectStore('history');
+
+        // Guardar el HTML completo
+        const htmlContent = formDiv.innerHTML;
+
+        // Obtener todos los inputs de tipo 'text' y sus valores
+        const inputs = formDiv.querySelectorAll('input[type="text"]');
+        const inputValues = {};
+
+        inputs.forEach(input => {
+            inputValues[input.name] = input.value;
+        });
+
+        // Guardar tanto el HTML como los valores de los inputs
+        const formularioObject = {
+            id: 2,
+            html: htmlContent, // Guardamos el HTML del formulario
+            inputValues: inputValues // Guardamos los valores de los inputs
+        };
+
+        const formularioRequest = store.put(formularioObject);
+        formularioRequest.onsuccess = function () {
+            //console.log('Formulario guardado con éxito');
+        };
+    };
+}
+
+function recuperarInspeccion() {
+    const request = indexedDB.open(dbName, dbVersion);
+    const formDiv = document.getElementById('inspectionForm');
+
+    request.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['history'], 'readwrite');
+        const store = transaction.objectStore('history');
+
+        const requestGet = store.get(2);
+        requestGet.onsuccess = function (event) {
+            const bodyObject = event.target.result;
+            if (bodyObject) {
+                // Recuperar el HTML guardado
+                formDiv.innerHTML = bodyObject.html;
+
+                // Recuperar los valores de los inputs guardados
+                const inputValues = bodyObject.inputValues;
+
+                // Asignar los valores a los inputs correspondientes
+                for (const key in inputValues) {
+                    const input = formDiv.querySelector(`input[name="${key}"]`);
+                    if (input) {
+                        input.value = inputValues[key]; // Asignar el valor recuperado
+                    }
+                }
+            } else {
+                //console.log('Body no encontrado');
+            }
+        };
+    };
+}
+
+
+/*
+async function guardarInspeccion(formDiv) {
+    const request = indexedDB.open(dbName, dbVersion);
+
+    request.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['history'], 'readwrite');
+        const store = transaction.objectStore('history');
+
+        // Guardar el formulario
+        const getRequest = store.get(2);
+        getRequest.onsuccess = function () {
+            const formularioObject = {
+                id: 2,
+                history: formDiv.innerHTML
+            };
+            const formularioRequest = store.put(formularioObject);
+            formularioRequest.onsuccess = function () {
+                //console.log('Formulario guardado con éxito');
+            };
+        };
+    }
+}
+
+function recuperarInspeccion() {
+    const request = indexedDB.open(dbName, dbVersion);
+    const formDiv = document.getElementById('inspectionForm');
+
+    request.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['history'], 'readwrite');
+        const store = transaction.objectStore('history');
+
+        const requestGet = store.get(2);
+        requestGet.onsuccess = function (event) {
+            const bodyObject = event.target.result;
+            if (bodyObject) {
+                formDiv.innerHTML = bodyObject.history;
+            } else {
+                //console.log('Body no encontrado');
+            }
+        };
+    };
+}*/
 
 /*******************************************************************/
 /*                       Crear la placa                            */
@@ -206,7 +455,7 @@ function crearPanelPlaca(placa, container) {
                 <input class="input-foto" id="foto-${formId}${i}" type="file" accept="image/*" onchange="previewImage(this)">
                 <label class="btn_upload" for="foto-${formId}${i}">
                 <div id="btn_upload-${formId}${i}"><img src="img/image-alt.svg"></div></label>
-                <button id="btn_camera-${formId}${i}" class="btn_camera" onclick="startCamera('${formId}${i}')"><img src="img/camera-alt.svg"></button></div></div>`).join('')}
+                <button id="btn_camera-${formId}${i}" class="btn_camera" onclick="startCamera('${formId}${i}', 'registro')"><img src="img/camera-alt.svg"></button></div></div>`).join('')}
                 <div class="section_btns"><button class="btn_guardar" onclick="guardar('${formId}', '${container}')"><img src="img/file-zip.svg"> Guardar</button>
                 <button class="btn_eliminar" onclick="eliminar('${formId}')"><img src="img/trash.svg"></button></div>
             `;
@@ -214,7 +463,7 @@ function crearPanelPlaca(placa, container) {
     formDiv.appendChild(formPlaca);
     actualizarFiltro()
     contador++;
-    guardarBody(formDiv);
+    guardarRegistro(formDiv);
 }
 
 function actualizarFiltro() {
@@ -236,7 +485,7 @@ function filtrarPlacas() {
 /*                        Función Camara                           */
 /*******************************************************************/
 
-function startCamera(id) {
+function startCamera(id, form) {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
         .then(stream => {
             let btn_foto = document.querySelector("#btn_foto");
@@ -244,6 +493,7 @@ function startCamera(id) {
             video.classList.add("active");
             camera.srcObject = stream;
             btn_foto.setAttribute("dataId", id);
+            btn_foto.setAttribute("dataForm", form);
         })
         .catch(error => {
             mostrarAlerta("ERROR", "Error accediendo a la cámara: " + error.message, "ACEPTAR", closeAlert)
@@ -259,6 +509,15 @@ function close_video() {
 }
 
 async function capture(stage) {
+    let dataForm = stage.getAttribute("dataForm");
+    if (dataForm == 'registro') {
+        captureRegistro(stage);
+    } else {
+        captureInspeccion(stage);
+    }
+}
+
+async function captureRegistro(stage) {
     let id = stage.getAttribute("dataId");
     let newStr = id.slice(0, -1);
     let pos = id.slice(-1);
@@ -294,7 +553,7 @@ async function capture(stage) {
             const fotoName = `foto-${name_btn[container][pos]}.${extension}`;
             guardarFotoEnIndexedDB(formPlaca.id, blob, placa.toUpperCase(), id, fotoName);
             const formDiv = document.getElementById('formulario');
-            guardarBody(formDiv);
+            guardarRegistro(formDiv);
             close_video();
         })
         .catch(err => {
@@ -335,7 +594,7 @@ async function previewImage(element) {
                 const mensaje = await guardarFotoEnIndexedDB(formPlaca.id, blob, placa.toUpperCase(), id, fotoName);
                 console.log(mensaje);
                 const formDiv = document.getElementById('formulario');
-                guardarBody(formDiv);
+                guardarRegistro(formDiv);
                 close_video();
             } catch (error) {
                 console.error("Error al guardar la foto:", error);
@@ -499,7 +758,8 @@ async function guardar(id, nuevo) {
 
     zip.generateAsync({ type: "blob" })
         .then(function (content) {
-            let nameZip = `placa-${placa.toUpperCase()}.zip`;
+            //let nameZip = `placa-${placa.toUpperCase()}.zip`;
+            let nameZip = `registro_${placa.toUpperCase()}_${fecha.value}.zip`;
             let texto = `¿ Quiere descargar como .ZIP las fotos de la placa ${placa.toUpperCase()} ?`;
             mostrarAlerta("Alerta", texto, "ACEPTAR", () => saveZip(content, nameZip, div), "CANCELAR", closeAlert)
         });
@@ -546,7 +806,7 @@ async function procesarBorrado(div) {
         console.log(resultado);
         div.remove();
         const formDiv = document.getElementById('formulario');
-        guardarBody(formDiv);
+        guardarRegistro(formDiv);
         closeAlert();
     } catch (error) {
         mostrarAlerta("Error", `Error durante el borrado: ${error}`, "ACEPTAR", closeAlert);
@@ -597,6 +857,494 @@ async function eliminarPorFormId(formId) {
         };
     });
 }
+
+
+/*******************************************************************/
+/*                Formulario Inspección Vehicular                  */
+/*******************************************************************/
+
+function resetFechaHora() {
+    const fecha = document.querySelector("#fecha");
+    const hora = document.querySelector("#hora");
+
+    fecha.value = new Date().toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+
+    hora.value = new Date().toLocaleString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+}
+
+resetFechaHora();
+
+//actualizarReloj();
+//setInterval(actualizarReloj, 1000);
+
+document.querySelector("#resetForm").addEventListener("click", () => {
+    procesarBorradoInspeccion();
+})
+
+/*******************************************************************/
+/*                      FotosFormInspeccion                        */
+/*******************************************************************/
+
+function crearFotosFormInspeccion() {
+    const formId = generarUUID();
+    const cant = name_btn[formInspeccion].length;
+    const formDiv = document.getElementById('fotos-formInspeccion');
+    const fotosInspeccion = document.createElement('div');
+    fotosInspeccion.className = 'fotosInspeccion';
+    fotosInspeccion.id = `fotosInspeccion-${formId}`;
+
+    const preview = document.createElement('div');
+    preview.id = `${formId}`;
+    preview.classList.add("section_preview");
+    preview.innerHTML += `
+        ${[...Array(cant)].map((_, i) => `<div class="section_foto"><img id="preview-${formId}${i}" class="preview">
+            <div class="buttons-foto" id="buttons-foto-${formId}${i}"><span>${name_btn[formInspeccion][i]}</span>
+            
+            <input class="input-foto" id="foto-${formId}${i}" type="file" accept="image/*" onchange="previewImageFormInspeccion(this)">
+            <label class="btn_upload" for="foto-${formId}${i}">
+            <div type="button" id="btn_upload-${formId}${i}"><img src="img/image-alt.svg"></div></label>
+            <button type="button" id="btn_camera-${formId}${i}" class="btn_camera" onclick="startCamera('${formId}${i}', 'inspeccion')"><img src="img/camera-alt.svg"></button></div></div>`).join('')}
+        `;
+
+    fotosInspeccion.appendChild(preview);
+    formDiv.appendChild(fotosInspeccion);
+}
+
+async function captureInspeccion(stage) {
+    let id = stage.getAttribute("dataId");
+    let newStr = id.slice(0, -1);
+    let pos = id.slice(-1);
+    const fotosInspeccion = document.getElementById(`fotosInspeccion-${newStr}`);
+    const video = document.getElementById("camera");
+    const canvas = document.getElementById("snapshot");
+
+    // Establece el tamaño del canvas igual al del video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Dibuja el contenido del video en el canvas
+    canvas.getContext('2d').drawImage(video, 0, 0);
+
+    // Convierte el contenido del canvas en un Data URL (en base64)
+    const dataURL = canvas.toDataURL('image/jpeg');
+
+    // Muestra la imagen
+    const preview = document.getElementById(`preview-${id}`);
+    preview.src = dataURL;
+    preview.classList.add("active");
+
+    // Actualiza el estilo del botón de la cámara
+    const buttons_foto = document.getElementById(`buttons-foto-${id}`);
+    buttons_foto.style.background = "#147a00";
+
+    // Convierte la imagen en un Blob
+    imgtoBlob(preview.src)
+        .then(({ blob, extension }) => {
+            // Guardar la foto
+            const fotoName = `foto-${name_btn[formInspeccion][pos]}.${extension}`;
+            guardarFotoEnIndexedDB(fotosInspeccion.id, blob, "INSPECCION", id, fotoName);
+            const formDiv = document.getElementById('inspectionForm');
+            guardarInspeccion(formDiv);
+            close_video();
+        })
+        .catch(err => {
+            console.error("Error:", err.message);
+        });
+}
+
+async function previewImageFormInspeccion(element) {
+    const preview = document.getElementById(`preview-${element.id.split('-')[1]}`);
+    const buttons_foto = document.getElementById(`buttons-foto-${element.id.split('-')[1]}`);
+    let id = element.id.split('-')[1];
+    const formPlaca = document.getElementById(`fotosInspeccion-${id.slice(0, -1)}`);
+    const pos = element.id.split('-')[1].slice(-1);
+    const file = element.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.addEventListener('load', function () {
+            preview.src = reader.result;
+            preview.classList.add("active");
+            buttons_foto.style.background = "#147a00";
+        });
+
+        reader.readAsDataURL(file);
+    } else {
+        preview.src = '';
+        preview.classList.remove("active");
+        buttons_foto.style.background = "#525f60";
+    }
+    // Convierte la imagen en un Blob
+    imgtoBlob(file)
+        .then(async ({ blob, extension }) => {
+            // Guardar la foto
+            const fotoName = `foto-${name_btn[formInspeccion][pos]}.${extension}`;
+            try {
+                const mensaje = await guardarFotoEnIndexedDB(formPlaca.id, blob, "INSPECCION", id, fotoName);
+                console.log(mensaje);
+                const formDiv = document.getElementById('inspectionForm');
+                guardarInspeccion(formDiv);
+                close_video();
+            } catch (error) {
+                console.error("Error al guardar la foto:", error);
+            }
+        })
+        .catch(err => {
+            console.error("Error:", err.message);
+        });
+}
+
+function saveFormulario() {
+    const formDiv = document.getElementById('inspectionForm');
+    guardarInspeccion(formDiv);
+}
+
+function marcarTodoNo() {
+    const radiosNo = document.querySelectorAll('input[type="radio"][value="No"]');
+    radiosNo.forEach(radio => {
+        radio.checked = true;
+        const formDiv = document.getElementById('inspectionForm');
+        guardarInspeccion(formDiv);
+    });
+}
+/*******************************************************************/
+/*                          Crear Firma                            */
+/*******************************************************************/
+const canvasInicial = document.getElementById('signatureCanvas');
+const ctxInicial = canvasInicial.getContext('2d');
+habilitarDibujo(canvasInicial, ctxInicial);
+
+/*
+// Obtener el canvas y contexto para dibujar
+const canvas = document.getElementById('signatureCanvas');
+const ctx = canvas.getContext('2d');
+let firma;
+
+// Variables para el control de dibujo
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+
+// Iniciar el dibujo cuando el usuario comienza a presionar el ratón
+canvas.addEventListener('mousedown', (e) => {
+    isDrawing = true;
+    lastX = e.offsetX;
+    lastY = e.offsetY;
+});
+
+// Detener el dibujo cuando el ratón se deja de presionar
+canvas.addEventListener('mouseup', () => {
+    isDrawing = false;
+});
+
+// Permitir el dibujo mientras el ratón se mueve
+canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing) return;
+
+    // Obtener las coordenadas del ratón en el canvas
+    const currentX = e.offsetX;
+    const currentY = e.offsetY;
+
+    // Dibujar una línea desde las últimas coordenadas hasta las actuales
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(currentX, currentY);
+    ctx.lineWidth = 2;  // Grosor de la línea
+    ctx.strokeStyle = 'black';  // Color de la firma
+    ctx.stroke();
+
+    // Actualizar las últimas coordenadas
+    lastX = currentX;
+    lastY = currentY;
+});
+
+// Limpiar el canvas al hacer clic en el botón "Limpiar"
+document.getElementById('clearButton').addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+// Guardar la firma como imagen al hacer clic en el botón "Guardar Firma"
+document.getElementById('saveButton').addEventListener('click', () => {
+    // Obtener la imagen en formato base64
+    const signatureImage = canvas.toDataURL("image/png");
+
+    // Mostrar la imagen capturada
+    const img = document.getElementById('signatureImage');
+    img.src = signatureImage;
+    firma = img.src;
+    img.style.display = 'block';
+
+    /*imgtoBlob(img.src)
+    .then(({ blob, extension }) => {
+        // Guardar la foto
+        const fotoName = `foto-firma.${extension}`;
+        guardarFotoEnIndexedDB("fotosFirma", blob, "INSPECCION", "01", fotoName);
+        const formDiv = document.getElementById('inspectionForm');
+        guardarInspeccion(formDiv);
+        close_video();
+    })
+    .catch(err => {
+        console.error("Error:", err.message);
+    });
+    /*img.style.display = 'block'; // Mostrar la imagen
+
+    // Crear un enlace de descarga
+    const link = document.createElement('a');
+    link.href = signatureImage;
+    link.download = 'firma.png'; // Nombre del archivo a guardar
+    link.click(); // Descargar la imagen
+});
+*/
+
+// Función para habilitar los eventos de dibujo en el canvas
+function habilitarDibujo(canvas, ctx) {
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    // Iniciar el dibujo cuando el usuario comienza a presionar el ratón
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        lastX = e.offsetX;
+        lastY = e.offsetY;
+    });
+
+    // Detener el dibujo cuando el ratón se deja de presionar
+    canvas.addEventListener('mouseup', () => {
+        isDrawing = false;
+        guardarFirma();
+    });
+
+    // Permitir el dibujo mientras el ratón se mueve
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+
+        const currentX = e.offsetX;
+        const currentY = e.offsetY;
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(currentX, currentY);
+        ctx.lineWidth = 2;  // Grosor de la línea
+        ctx.strokeStyle = 'black';  // Color de la firma
+        ctx.stroke();
+
+        lastX = currentX;
+        lastY = currentY;
+    });
+
+    // Limpiar el canvas si se desea
+    document.getElementById('clearButton').addEventListener('click', () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const img = document.getElementById('signatureImage');
+        img.removeAttribute("src");
+        const formDiv = document.getElementById('inspectionForm');
+        guardarInspeccion(formDiv);
+    });
+}
+
+function guardarFirma() {
+    console.log("guardar firma")
+    const canvas = document.getElementById('signatureCanvas');
+    const signatureImage = canvas.toDataURL("image/png");
+
+    // Mostrar la imagen capturada
+    const img = document.getElementById('signatureImage');
+    img.src = signatureImage;
+
+    const formDiv = document.getElementById('inspectionForm');
+    guardarInspeccion(formDiv);
+}
+
+// Función para guardar el canvas con fondo blanco
+function guardarCanvasConFondoBlanco() {
+    // Primero, dibujamos un fondo blanco en todo el canvas
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);  // Rellenamos todo el canvas de blanco
+
+    // Luego, recuperamos la imagen del canvas con fondo blanco
+    const signatureImage = canvas.toDataURL("image/png");
+
+    const img = document.getElementById('signatureImage');
+    img.src = signatureImage;
+
+    // Ahora puedes guardar la imagen como antes, por ejemplo en IndexedDB o descargarla
+    return img;
+}
+
+
+
+/*******************************************************************/
+/*                       Guardar Formulario                        */
+/*******************************************************************/
+
+document.getElementById("inspectionForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const zip = new JSZip();
+    const respuestas = [];
+
+    const formData = new FormData(form);
+    let placa = "sinplaca";
+    let fechaSave = "sindate";
+
+    const div = document.getElementById('fotos-formInspeccion');
+    const imgElements = div.querySelectorAll('.preview');
+
+    let imagenes = [];
+    for (const img of imgElements) {
+        if (img.src && img.src.trim() !== "") {
+            imagenes.push(img.src);
+        }
+    }
+    if (imagenes.length < 6) {
+        let texto = 'Debes subir todas las fotos."';
+        mostrarAlerta("Alerta", texto, "ACEPTAR", closeAlert)
+        return;
+    }
+
+    const firma = document.getElementById('signatureImage');
+    //const firma = guardarCanvasConFondoBlanco();
+    if (firma.src && firma.src.trim() !== "") {
+        imagenes.push(firma.src);
+    } else {
+        let texto = 'Debes agregar la firma."';
+        mostrarAlerta("Alerta", texto, "ACEPTAR", closeAlert)
+        return;
+    }
+
+    await agregarImagenesAlZipInspeccion(imagenes, name_btn, formInspeccion, zip);
+
+    formData.forEach((value, key) => {
+        if (value instanceof File && value.name) {
+            zip.file(`fotos/${key}_${value.name}`, value);
+        } else {
+            respuestas.push(`${key}: ${value}`);
+            if (key === "placa_vehiculo") placa = value.replace(/\s+/g, "_");
+        }
+    });
+
+    zip.file("respuestas.txt", respuestas.join("\n"));
+    const blob = await zip.generateAsync({ type: "blob" });
+    const nombreArchivo = `inspeccion_${placa.toUpperCase()}_${fecha.value}.zip`;
+    saveAs(blob, nombreArchivo);
+    procesarBorradoInspeccion()
+});
+
+async function agregarImagenesAlZipInspeccion(imagenes, name_btn, nuevo, zip) {
+    const promesas = imagenes.map((imgSrc, i) =>
+        imgtoBlob(imgSrc)
+            .then(({ blob, extension }) => {
+                if (name_btn[nuevo][i] != undefined) {
+                    zip.file(`fotos/foto-${name_btn[nuevo][i]}.${extension}`, blob);
+                } else {
+                    let empleado = document.querySelector("#encargado_nombre");
+                    zip.file(`fotos/firma-${empleado.value}.${extension}`, blob);
+                }
+
+            })
+            .catch(err => {
+                console.error(`Error en imagen ${i}:`, err.message);
+            })
+    );
+
+    await Promise.all(promesas);
+    console.log("✅ Todas las imágenes fueron agregadas al ZIP");
+}
+
+async function procesarBorradoInspeccion() {
+    try {
+        const fotosInspeccionId = document.querySelector('.fotosInspeccion');
+        const resultado = await eliminarPorFormId(fotosInspeccionId.id);
+        console.log(resultado);
+        fotosInspeccionId.remove();
+        const formDiv = document.getElementById('inspectionForm');
+        formDiv.reset();
+        resetCanvas();
+        resetFechaHora();
+        crearFotosFormInspeccion();
+        guardarInspeccion(formDiv);
+    } catch (error) {
+        mostrarAlerta("Error", `Error durante el borrado: ${error}`, "ACEPTAR", closeAlert);
+    }
+}
+
+function resetCanvas() {
+    const canvas = document.getElementById('signatureCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+}
+
+async function eliminarPorFormId(formId) {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName, dbVersion);
+
+        request.onerror = (event) => {
+            reject(`Error al abrir la base de datos: ${event.target.error}`);
+        };
+
+        request.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(['registro'], 'readwrite');
+            const store = transaction.objectStore('registro');
+
+            let eliminados = 0;
+
+            // Asegúrate de que el índice 'by_formId' exista
+            console.log(formId)
+            const index = store.index('by_formId');
+            const range = IDBKeyRange.only(formId);
+            const cursorRequest = index.openCursor(range);
+
+            cursorRequest.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    cursor.delete();
+                    eliminados++;
+                    cursor.continue();
+                }
+            };
+
+            cursorRequest.onerror = (event) => {
+                reject(`Error al recorrer los datos: ${event.target.error}`);
+            };
+
+            transaction.oncomplete = () => {
+                db.close();
+                resolve(`Se eliminaron ${eliminados} registros con formId = ${formId}`);
+            };
+
+            transaction.onerror = (event) => {
+                reject(`Error en la transacción: ${event.target.error}`);
+            };
+        };
+    });
+}
+
+
+crearFotosFormInspeccion();
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*******************************************************************/

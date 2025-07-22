@@ -1,19 +1,185 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Register</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body class="index-body">
-    <main>
-        <h1>Registro de Vehículos</h1>
-        <div class="section-search">
-            <input type="text" id="buscador" placeholder="Buscar placa..." oninput="filtrarPlacas()">
-            <button class="btn_addPlaca" onclick="agregarEntrada()">Agregar Placa</button>
-        </div>
-        <div id="formulario"></div>
+    <main id="main">
+        <section id="opcion_formulario">
+            <div class="radio-group-formularios">
+                <input type="radio" id="opcion-form1" name="opcion_formulario" value="registro_vehiculos" checked>
+                <label for="opcion-form1">Registro de Vehículos</label>
+                <input type="radio" id="opcion-form2" name="opcion_formulario" value="inspeccion_vehicular">
+                <label for="opcion-form2">Inspección Vehicular</label>
+            </div>
+        </section>
+        <section id="registro_vehiculos">
+            <h1>Registro de Vehículos</h1>
+            <div class="section-search">
+                <input type="text" id="buscador" placeholder="Buscar placa..." oninput="filtrarPlacas()">
+                <button class="btn_addPlaca" onclick="agregarEntrada()">Agregar Placa</button>
+            </div>
+            <div id="formulario"></div>
+        </section>
+        <section id="inspeccion_vehicular">
+            <h1>Inspección Vehicular</h1>
+            <button type="button" id="resetForm"><img src="img/trash.svg"></button>
+            <form id="inspectionForm">
+                <fieldset class="datos-generales">
+                    <legend>DATOS GENERALES</legend>
+                    <div class="inputs-form">
+                        <label for="fecha">Fecha</label>
+                        <input type="text" id="fecha" name="fecha" readonly>
+                    </div>
+                    <div class="inputs-form">
+                        <label for="hora">Hora</label>
+                        <input type="text" id="hora" name="hora" readonly>
+                    </div>
+                    <div class="inputs-form">
+                        <label>Ubicación</label>
+                        <div class="radio-group">
+                            <input type="radio" id="opcion-ubicacion1" name="ubicacion" value="PATIO" checked>
+                            <label for="opcion-ubicacion1">PATIO</label>
+                            <input type="radio" id="opcion-ubicacion2" name="ubicacion" value="MUELLE">
+                            <label for="opcion-ubicacion2">MUELLE</label>
+                        </div>
+                    </div>
+                    <div class="inputs-form">
+                        <label for="nombre_conductor">Nombre del Conductor</label>
+                        <input type="text" id="nombre_conductor" name="nombre_conductor" required>
+                    </div>
+                    <div class="inputs-form">
+                        <label for="cedula">Cédula de Ciudadanía</label>
+                        <input type="text" id="cedula" name="cedula" required>
+                    </div>
+                    <div class="inputs-form">
+                        <label for="empresa_transportadora">Empresa Transportadora</label>
+                        <input type="text" id="empresa_transportadora" name="empresa_transportadora" required>
+                    </div>
+                    <div class="inputs-form">
+                        <label for="numero_precinto">No. de precinto</label>
+                        <input type="text" id="numero_precinto" name="numero_precinto" required>
+                    </div>
+                    <div class="inputs-form">
+                        <label for="placa_vehiculo">Placa del vehículo</label>
+                        <input type="text" id="placa_vehiculo" name="placa_vehiculo" required>
+                    </div>
+                    <div class="inputs-form">
+                        <label for="codigo_contenedor">Cód. de contenedor</label>
+                        <input type="text" id="codigo_contenedor" name="codigo_contenedor" required>
+                    </div>
+                </fieldset>
+                <script>
+                    let contadorPreguntas = 1;
+                    function renderPregunta(nombre, texto) {
+                        const numero = contadorPreguntas++;
+                        document.write(`<div class="pregunta"><strong>${numero}.</strong> ${texto}</div>
+                        <div class="radio-group">
+                          <input type="radio" id="${nombre}1" name="${nombre}" value="Sí" required onclick="saveFormulario()">
+                          <label for="${nombre}1">SI</label>
+                          <input type="radio" id="${nombre}2" name="${nombre}" value="No" onclick="saveFormulario()">
+                          <label for="${nombre}2">NO</label>
+                        </div>`);
+                    }
+                </script>
+                <button class="btn-marcarNO" type="button" onclick="marcarTodoNo()">Seleccionar todas como NO</button>
+                <section class="section-preguntas">
+                    <fieldset class="preguntas-container">
+                        <legend>VEHÍCULO</legend>
+                        <script>
+                            renderPregunta("vehiculo_cabina_irregular", "¿Se detectan elementos irregulares en la cabina del vehículo?");
+                            renderPregunta("vehiculo_parachoques", "¿Presenta compartimentos escondidos en parachoques?");
+                            renderPregunta("vehiculo_llantas", "¿Presenta compartimentos escondidos en llantas?");
+                            renderPregunta("vehiculo_tanque", "¿El tanque de combustible se encuentra sin cobertor?");
+                            renderPregunta("vehiculo_bateria", "¿La caja de la batería se encuentra sin cobertor?");
+                        </script>
+                    </fieldset>
+                    <fieldset class="preguntas-container">
+                        <legend>REMOLQUE</legend>
+                        <script>
+                            renderPregunta("remolque_inferior", "¿Se detectan elementos irregulares en la parte inferior?");
+                            renderPregunta("remolque_parachoques", "¿Presenta compartimentos escondidos en parachoques?");
+                            renderPregunta("remolque_neumaticos", "¿Presenta compartimentos escondidos en neumáticos?");
+                            renderPregunta("remolque_llantas", "¿Presenta compartimentos escondidos en llantas?");
+                            renderPregunta("remolque_compresor", "¿Se detectan pimpinas, baldes u otros elementos en área de compresor del aire?");
+                        </script>
+                    </fieldset>
+                    <fieldset class="preguntas-container">
+                        <legend>CONTENEDOR</legend>
+                        <script>
+                            renderPregunta("contenedor_golpes", "¿Presenta abolladuras o golpes en alguna sección?");
+                            renderPregunta("contenedor_bisagras", "¿Presenta bisagras con muestras de pintura fresca, soldadura o macilla?");
+                            renderPregunta("contenedor_barras", "¿Presenta barras de seguridad con golpes, reparaciones o adecuaciones?");
+                            renderPregunta("contenedor_abrazaderas", "¿Presenta abrazaderas con golpes, reparaciones o adecuaciones?");
+                            renderPregunta("contenedor_manijas", "¿Presenta manijas con golpes, reparaciones o adecuaciones?");
+                            renderPregunta("contenedor_precintos1", "¿Los precintos tienen rastros de aceite, grasa o los números están repisados?");
+                            renderPregunta("contenedor_olor", "¿Se perciben olores fuertes o color irregular en el contenedor?");
+                            renderPregunta("contenedor_precinto_suelto", "¿Se desprende el precinto al halarlo?");
+                            renderPregunta("contenedor_precinto_diferente", "¿El número de precinto es diferente al registrado en el sistema o en los documentos?");
+                            renderPregunta("contenedor_precinto_repisado", "¿Los precintos tienen números repisados o se observan desgastados o manipulados?");
+                            renderPregunta("contenedor_seguridad", "¿El precinto es de alta seguridad? Verificar que tengan tallada una letra 'H' en la base");
+                        </script>
+                    </fieldset>
+                    <fieldset class="preguntas-container">
+                        <legend>CONTENEDOR INTERNO</legend>
+                        <script>
+                            renderPregunta("interno_piso", "¿El piso presenta desniveles o sobresaltos?");
+                            renderPregunta("interno_techo", "¿El techo presenta desniveles o sobresaltos?");
+                            renderPregunta("interno_paneles", "¿Los paneles laterales presentan desniveles o sobresaltos?");
+                            renderPregunta("interno_pernos", "¿Se observan sobresaltos en pernos, tornillos o travesaños?");
+                        </script>
+                    </fieldset>
+                    <fieldset class="preguntas-container">
+                        <legend>PLANCHÓN</legend>
+                        <script>
+                            renderPregunta("planchon_lamina", "¿La lámina de la superficie del planchón presenta sobresaltos?");
+                            renderPregunta("planchon_carpas", "¿Las carpas presentan roturas o daños en su estructura?");
+                            renderPregunta("planchon_lazo_suelto", "¿El lazo viene suelto o no está sujeto a las armellas?");
+                            renderPregunta("planchon_lazo_danio", "¿Los lazos presentan roturas, desgaste o daños en su estructura?");
+                            renderPregunta("planchon_precinto_diferente", "¿El número de precinto es diferente al registrado en el sistema o en los documentos?");
+                            renderPregunta("planchon_precinto_repisado", "¿Los precintos tienen números repisados o se observan desgastados o manipulados?");
+                        </script>
+                    </fieldset>
+                    <fieldset class="preguntas-container">
+                        <legend>FOTOS</legend>
+                        <div id="fotos-formInspeccion"></div>
+                    </fieldset>
+                    <fieldset class="datos-generales">
+                        <legend>ENCARGADO DE LA REVISIÓN</legend>
+                        <div class="inputs-form">
+                            <label for="encargado_nombre">Nombres y Apellidos</label>
+                            <input type="text" id="encargado_nombre" name="encargado_nombre" required>
+                        </div>
+                        <div class="inputs-form">
+                            <label for="cedula_encargado">Número de cédula de ciudadanía</label>
+                            <input type="text" id="cedula_encargado" name="cedula_encargado" required>
+                        </div>
+                        <div class="inputs-form">
+                            <label for="cargo_encargado">Cargo</label>
+                            <input type="text" id="cargo_encargado" name="cargo_encargado" required>
+                        </div>
+                        <!--<label>Firma (imagen):
+                            <input type="file" name="firma_encargado" accept="image/*" required>
+                        </label>-->
+                        <h4 class="firma-title">Firma Digital</h4>
+                        <div class="firma-container">
+                            <canvas id="signatureCanvas"></canvas>
+                            <button type="button" id="clearButton"><img src="img/trash.svg"></button>
+                            <!--<button type="button" id="saveButton">Guardar Firma</button>-->
+                            <img id="signatureImage" src="" alt="Firma" style="display:none;">
+                        </div>
+                    </fieldset>
+
+                    <button class="btn-inspeccion" type="submit">Enviar y descargar ZIP</button>
+
+                </section>
+            </form>
+        </section>
     </main>
     <div id="video">
         <button id="btn_closeVideo" onclick="close_video()"><img src="img/close.svg"></button>
@@ -24,6 +190,7 @@
 
     <script src="js/jszip.min.js"></script>
     <script src="js/FileSaver.min.js"></script>
-    <script src="js/main.js"></script> 
+    <script src="js/main.js"></script>
 </body>
+
 </html>

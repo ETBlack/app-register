@@ -230,6 +230,9 @@ html {
 main {
     padding: 20px;
     overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 h1 {
@@ -431,8 +434,8 @@ h1 {
     align-items: center;
     width: 25%;
     padding: 5px;
-    font-size: medium;    
-    border: none;    
+    font-size: medium;
+    border: none;
     cursor: pointer;
 }
 
@@ -543,6 +546,321 @@ h1 {
 
 @media screen and (min-width: 700px) {}
 
+
+/*=====================================================*/
+/* 📄 Formulario Inspección
+/*=====================================================*/
+
+.radio-group-formularios {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1px;
+    margin-bottom: 1em;
+}
+
+.radio-group-formularios label {
+    background-color: #efefef;
+    padding: 10px;
+    color: #212529;
+    font-size: smaller;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    border-bottom: 1px solid #adadad;
+    text-align: center;
+}
+
+.radio-group-formularios input {
+    display: none;
+}
+
+.radio-group-formularios input:checked+label {
+    background-color: #1f7578;
+    color: #fff;
+}
+
+#registro_vehiculos,
+#inspeccion_vehicular {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+#inspeccion_vehicular {
+    position: relative;
+}
+
+.visible {
+    display: flex !important;
+}
+
+#inspectionForm {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+}
+
+.datos-generales,
+.preguntas-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5em;
+    padding: 1em;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+}
+
+legend {
+    font-weight: bold;
+}
+
+.inputs-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: smaller;
+    overflow: hidden;
+}
+
+.pregunta {
+    width: 100%;
+    text-align: start;
+    font-size: smaller;
+}
+
+.inputs-form label {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding: 7px;
+    background: #ccc;
+    text-wrap-mode: nowrap;
+}
+
+.inputs-form input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 32px;
+    border: none;
+    padding: 0 10px;
+}
+
+.inputs-form input:focus {
+    outline: 1px solid #999999;
+}
+
+.radio-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: -webkit-fill-available;
+    gap: 2px;
+    border: 1px solid gainsboro;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 3px;
+    background: gainsboro;
+}
+
+.radio-group label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #efefef;
+    padding: 5px;
+    color: #212529;
+    cursor: pointer;
+    width: -webkit-fill-available;
+}
+
+.radio-group input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.radio-group input:checked+label {
+    background-color: #1f7578;
+    color: #fff;
+}
+
+.radio-group label.error {
+    background-color: #ffdddd; /* Fondo rojo claro */
+    color: #ff0000; /* Texto rojo */
+    border: 1px solid #ff0000; /* Borde rojo */
+}
+
+/*
+.radio-group input:invalid + label {
+    background-color: #ffdddd;
+    color: #ff0000;
+    border: 1px solid #ff0000;
+}
+
+input[type="radio"] {
+    position: relative;
+    min-width: 20px;
+    width: 20px;
+    height: 20px;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    outline: none;
+}
+
+input[type="radio"]:checked {
+    background-color: #fff;
+    border-color: red;
+}
+
+input[type="radio"]:checked::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    transform: translate(-50%, -50%);
+    background-color: red;
+    border-radius: 50%;
+}
+
+input[type="radio"]:hover {
+    border-color: red;
+}
+
+input[type="radio"]:checked:hover {
+    border-color: red;
+    background-color: #fff;
+}*/
+
+.btn-marcarNO {
+    border: none;
+    border-radius: 5px;
+    padding: 7px 10px;
+    background-color: #1f7578;
+    color: #fff;
+    cursor: pointer;
+}
+
+.section-preguntas {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
+.preguntas-container .radio-group {
+    width: 50%;
+}
+
+.preguntas-container label {
+    color: #212529;
+    font-size: smaller;
+    width: 100%;
+}
+
+.btn-inspeccion {
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    background: #00787a;
+    color: #fff;
+    cursor: pointer;
+}
+
+.firma-title {
+    display: flex;
+    width: 100%;
+}
+
+.firma-container {
+    position: relative;
+    width: 100%;
+}
+
+#signatureCanvas {
+    width: 100%;
+    height: 150px;
+    background: #fff;
+    border: 1px solid gainsboro;
+    border-radius: 5px;
+    cursor: crosshair;
+}
+
+#clearButton,
+#resetForm {
+    border: none;
+    border-radius: 5px;
+    padding: 3px 5px;
+    color: #fff;
+    cursor: pointer;
+    position: absolute;
+}
+
+#clearButton {
+    bottom: .5em;
+    right: .5em;
+}
+
+#resetForm {
+    top: .5em;
+    right: .5em;
+}
+
+#clearButton,
+#resetForm {
+    background-color: red;
+}
+
+#clearButton:hover,
+#resetForm:hover {
+    background-color: rgb(192, 1, 1);
+}
+
+@media screen and (min-width: 700px) {
+    .datos-generales {
+        flex-direction: row;
+    }
+
+    .datos-generales,
+    .preguntas-container,
+    .btn-inspeccion {
+        font-size: 1em;
+        width: 60%;
+    }
+
+    .inputs-form {
+        flex-direction: row;
+        width: auto;
+        flex-grow: 1;
+    }
+
+    .inputs-form label,
+    .radio-group input {
+        width: inherit;
+        height: -webkit-fill-available;
+    }
+}
 
 /*=====================================================*/
 /* 📄 Alert
