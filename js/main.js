@@ -1150,6 +1150,50 @@ function habilitarDibujo(canvas, ctx) {
         const formDiv = document.getElementById('inspectionForm');
         guardarInspeccion(formDiv);
     });
+
+    // Iniciar dibujo cuando el usuario toca la pantalla
+    canvas.addEventListener('touchstart', function (e) {
+        e.preventDefault();  // Prevenir el comportamiento predeterminado (evitar el zoom)
+        isDrawing = true;
+
+        const { x, y } = getTouchPosition(e);
+        ctx.beginPath();
+        ctx.moveTo(x, y);  // Empieza el trazo en las coordenadas del toque
+    });
+
+    // Dibujar mientras el usuario mueve el dedo sobre el canvas
+    canvas.addEventListener('touchmove', function (e) {
+        e.preventDefault();  // Prevenir el comportamiento predeterminado (evitar el desplazamiento de la página)
+        if (!isDrawing) return;
+
+        const { x, y } = getTouchPosition(e);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    });
+
+    // Detener el dibujo cuando el usuario deja de tocar la pantalla
+    canvas.addEventListener('touchend', function (e) {
+        e.preventDefault();
+        isDrawing = false;
+        ctx.closePath();  // Termina el trazo
+    });
+
+    // También es recomendable manejar el caso de que el usuario cancele el toque
+    canvas.addEventListener('touchcancel', function (e) {
+        e.preventDefault();
+        isDrawing = false;
+        ctx.closePath();
+    });
+}
+
+// Función para obtener las coordenadas del toque, ajustadas para dispositivos móviles
+function getTouchPosition(e) {
+    let touch = e.touches[0];  // Solo tomamos el primer toque
+    let rect = canvas.getBoundingClientRect();  // Obtener la posición del canvas en la pantalla
+    return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+    };
 }
 
 function guardarFirma() {
