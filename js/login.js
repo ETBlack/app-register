@@ -1,6 +1,6 @@
 // Datos usuario registrado
 const username = "admin";
-let hashedPassword = "$2b$10$TRLqUrjsdTEebfKcmobXyeNnuI.JZuT/SpEPA7qrba1zoh6Muna3K";
+let hashedPassword = "$2b$10$fM07G2oGTRXYsjthqGaD/elu7AsMbQKjB1WHDxCaxT.OOBFrBkn2q";
 
 /* Generar el hash de la contraseña
 const plainPassword = "";
