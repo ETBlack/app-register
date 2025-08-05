@@ -1855,8 +1855,8 @@ function logout() {
 // Detecta si el usuario está navegando hacia atrás
 window.addEventListener('popstate', function (event) {
     //console.log("El usuario ha pulsado el botón Atrás");
-    history.pushState(null, null, window.location.href);
     logout();
+    history.pushState(null, null, window.location.href);
 });
 
 // Validar estado de la sesión
