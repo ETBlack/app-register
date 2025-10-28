@@ -1243,6 +1243,7 @@ document.getElementById("inspectionForm").addEventListener("submit", async funct
     const formData = new FormData(form);
     let placa = "sinplaca";
     let fechaSave = "sindate";
+    let codigo_contenedor = "sincontainer";
 
     const div = document.getElementById('fotos-formInspeccion');
     const imgElements = div.querySelectorAll('.preview');
@@ -1277,12 +1278,13 @@ document.getElementById("inspectionForm").addEventListener("submit", async funct
         } else {
             respuestas.push(`${key}: ${value}`);
             if (key === "placa_vehiculo") placa = value.replace(/\s+/g, "_");
+            if (key === "codigo_contenedor") codigo_contenedor = value.replace(/\s+/g, "_");
         }
     });
 
     zip.file("respuestas.txt", respuestas.join("\n"));
     const blob = await zip.generateAsync({ type: "blob" });
-    const nombreArchivo = `inspeccion_${placa.toUpperCase()}_${fecha.value}.zip`;
+    const nombreArchivo = `inspeccion_${codigo_contenedor.toUpperCase()}_${fecha.value}.zip`;
     saveAs(blob, nombreArchivo);
     procesarBorradoInspeccion()
 });
