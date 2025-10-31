@@ -35,7 +35,7 @@ let formInspeccion = "formulario";
 let name_btn = {
     [container_1]: ["Precinto", "Tablero", "Ficho", "Hoja1", "Hoja2", "100%", "50%", "0%"],
     [container_2]: ["Precinto", "Tablero", "Ficho", "Hoja1", "Hoja2", "100%", "75%", "50%", "25%", "0%"],
-    [formInspeccion]: ["Precinto", "Ficho", "Frontal", "Trasera", "Lado Derecho", "Lado Izquierdo"]
+    [formInspeccion]: ["Precinto", "Ficho", "Frontal", "Trasera", "Lado Derecho", "Lado Izquierdo", "Hoja1", "Hoja2"]
 };
 
 const dbName = 'registroPlacaDB';
